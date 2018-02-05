@@ -1,0 +1,69 @@
+#!/bin/bash
+
+testName()
+{
+	found1=$(echo $firstName | egrep "\b([A-Z])([a-z])+\b")
+	found2=$(echo "$lastName" | egrep -x "([A-Z][a-z]+)( [A-Z]\.)?")
+	if [[ -n "$found1" ]] && [[ -n "$found2" ]]
+	then
+		nameBool=true
+	else
+		nameBool=false
+	fi
+	
+}
+
+testAddr()
+{
+	found4=$(echo $number | egrep "\b[0-9]+\b")
+	found5=$(echo $street | egrep -x "((([A-Z])|([0-9]+))([a-zA-Z\.0-9])* ?)+")
+	#echo $street
+	#echo $found5
+	if [[ "$street" = "$found5" ]] && [[ -n "$found4" ]]
+	then
+		addrBool=true
+	else 
+		addrBool=false
+	fi
+}
+
+if [ $# != 1 ]
+then
+	echo "Usage: verify <filename>"
+	exit 1
+fi
+if [ ! -r $1 ]
+then
+	echo "Error: $file is not readable!"
+	exit 2
+fi
+name=$(cut -d ';' -f1 $1)
+addr=$(cut -d ';' -f2 $1)
+firstName=$(cut -d ',' -f1 <(echo "$name"))
+lastName=$(awk -F ', ' '{print $2}' <(echo "$name"))
+letter=$(cut -d ' ' -f3 <(echo "$name"))
+number=$(cut -d ' ' -f1 <(echo "$addr"))
+street=$(cut -d ' ' -f2- <(echo "$addr"))
+testName
+testAddr
+# echo $nameBool
+# echo $addrBool
+if $nameBool && $addrBool
+then
+	echo "Data is valid."
+	exit 0
+fi
+
+if $nameBool && [[ ! "$addrBool" = true ]]
+then
+	echo "Invalid address!"
+	exit 1
+fi
+
+if [[ ! "$nameBool" = true ]] && $addrBool
+then
+	echo "Invalid name!"
+	exit 1
+fi
+echo "Invalid name and address!"
+exit 1

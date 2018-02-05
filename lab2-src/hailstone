@@ -1,0 +1,19 @@
+#!/bin/sh
+if [ $# -eq 0 ]
+  then
+    echo "Usage: hailstone <start> <limit>"
+    exit 0
+fi
+a=$1
+for i in `seq 1 $2`
+do
+	echo -n "$a "
+	if [ $((a % 2)) -eq 0 ]
+	then
+		a=$((a / 2))
+	else
+		a=$((a * 3 + 1))	
+	fi
+done
+printf "\n"
+exit 0

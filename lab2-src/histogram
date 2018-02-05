@@ -1,0 +1,40 @@
+#!/bin/bash
+roundup()
+{
+	i=$(($1 / 10))
+}
+if [ $# -eq 0 ]
+then
+	echo "Usage: histogram <filename>"
+	exit 1
+fi
+file=$1
+if [ ! -r $file ]
+then
+	echo "Error: $file is not readable!"
+	exit 1
+fi
+count=0
+s=0
+for i in $(awk '{print $2}' $file)
+do
+	count=$(($count + 1))
+	s=$(($s+$i))
+	roundup $i
+	array[$i]=$((array[$i] + 1))
+done
+s=$(($s / $count ))
+echo "$count scores total..."
+
+for ((i = 10; i >= 0 ; i--))
+do
+	echo -n $(($i * 10)) ": "
+	for j in `seq 1 ${array[$i]}`
+	do
+		printf "="
+	done
+	echo
+done
+
+echo "Average: $s"
+exit 0

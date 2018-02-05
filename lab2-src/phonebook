@@ -1,0 +1,34 @@
+#!/bin/sh
+if [ $# -gt 0 ]
+then
+	echo "Usage: phonebook"
+	exit 1
+fi
+echo "Welcome to MagicPhone!"
+echo -n "Please enter part or all of a name to search for: "
+read name
+matchCount=$(cat house_dir_tab.txt | grep $name | wc -l)
+
+if [ $matchCount -gt 0 ]
+then
+	cat house_dir_tab.txt | grep $name | head -n 1 > temp
+	if [ $matchCount -gt 1 ]
+	then
+		echo "I found $matchCount matches."
+		echo "You might want to be more specific."
+		echo "The first of these matches is:"
+		
+	elif [ $matchCount = 1 ]
+	then
+		echo "Match found!"
+	fi
+	echo "Name: $(cut -f 1 temp)"
+	echo "State: $(cut -f 2 temp)"
+	echo "Phone: $(cut -f 4 temp)"
+	echo "Search complete on $(date)"
+	rm temp
+	exit 0
+else
+	echo "Sorry, I could not find that person."
+	exit 1
+fi

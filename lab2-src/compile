@@ -1,0 +1,39 @@
+#!/bin/sh
+compile=true
+if [ $# -gt 0 ]
+	then
+	echo "Usage: compile"
+	exit 0
+fi
+for file in $(ls src*.c)
+do
+	echo "C program: $file"
+	gcc -Wall -std=c99 $file
+	if [ $? != 0 ]
+	then
+		echo "Compilation of $file failed!"
+		$compile=false
+	else
+		echo "Successfully compiled!"
+		for data in $(ls input*.data)
+		do
+			echo "Input file: $data."
+			a.out < $data
+			if [ $? = 0 ]
+			then
+				echo "Run successful."
+			else
+				$compile=false
+				echo "Run failed on $data"
+			fi
+		done
+	fi
+	echo 
+done
+
+if [ $compile = true ]
+then
+	exit 0
+else
+	exit 1
+fi

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for i in `seq 1 11`
+do
+	echo "verify addr$i" >> verifyT
+	verify addr$i >> verifyT
+done
+diff verifyT test.txt
+rm verifyT

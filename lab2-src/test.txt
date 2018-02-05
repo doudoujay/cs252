@@ -1,0 +1,22 @@
+verify addr1
+Data is valid.
+verify addr2
+Invalid address!
+verify addr3
+Data is valid.
+verify addr4
+Data is valid.
+verify addr5
+Invalid name and address!
+verify addr6
+Invalid name and address!
+verify addr7
+Invalid name and address!
+verify addr8
+Invalid name and address!
+verify addr9
+Invalid name and address!
+verify addr10
+Data is valid.
+verify addr11
+Invalid address!

@@ -1,0 +1,117 @@
+source\ .* {
+	char* file = strdup(yytext + 7);
+	FILE* fp = fopen(file, "r");
+	if(fp == NULL){
+		perror("Failed reading file");
+		exit(2);
+	}
+	char* cmd = (char *)malloc(1024);
+	int inT = dup(0);
+	int inF = open(file, O_RDONLY);
+	dup2(inF, 0); //redirect
+	close(inF);
+	int i = 0;
+	while(true){
+		char c = mygetc(fp);
+		if(c == EOF) break;
+		cmd[i++] = c;
+	}
+	cmd[i] = '\0';
+	fclose(fp);
+	dup2(inT, 0);
+	close(inT);
+	for(int j = strlen(cmd); j >= 0; j--){
+		unput(cmd[j]);
+	}
+}
+
+[^ \t\n|><&]*\\[^ \t\n]*
+
+[^ \t\n|><&]*\\n[^ \t\n]* {
+	const std::string* temp = new std::string(yytext);
+	std::string processed = Shell::unescape(*temp);
+	printf("dsdsa\n");
+}
+
+source\ .* {
+	//escape first
+	const std::string* temp = new std::string(yytext);
+	std::string processed = Shell::unescape(*temp);
+	std::stringstream test(processed);
+	std::string segment;
+	std::vector<std::string> seglist;
+	while(std::getline(test, segment, '\n'))
+	{
+	   seglist.push_back(segment);
+	}
+	char* file = strdup(seglist[0].c_str() + 7);
+	FILE* fp = fopen(file, "r");
+	if(fp == NULL){
+		perror("Failed reading file");
+		exit(2);
+	}
+	char* cmd = (char *)malloc(1024);
+	int inT = dup(0);
+	int inF = open(file, O_RDONLY);
+	dup2(inF, 0); //redirect
+	close(inF);
+	int i = 0;
+	while(true){
+		char c = mygetc(fp);
+		if(c == EOF) break;
+		cmd[i++] = c;
+	}
+	cmd[i] = '\0';
+	//dump new lines in cmd
+	for(int z = 1; z < seglist.size(); z++){
+		strcat(cmd, seglist[z].c_str());
+	}
+
+	fclose(fp);
+	dup2(inT, 0);
+	close(inT);
+	for(int j = strlen(cmd); j >= 0; j--){
+		unput(cmd[j]);
+	}
+}
+
+\$\{.*\} {
+	//env
+	char * cmd = strdup(yytext + 2);
+	if(cmd[yyleng - 3] == '}') cmd[yyleng - 3] = '\0';
+	if(strcmp(cmd, "$") == 0){
+		std::string s = std::to_string(getpid());
+		cmd = (char*)s.c_str();
+	}else if(strcmp(cmd, "?") == 0){
+
+	}else if(strcmp(cmd, "!") == 0){
+
+	}else if(strcmp(cmd, "_") == 0){
+
+	}else if(strcmp(cmd, "SHELL") == 0){
+
+	}
+	char* envVar = getenv(cmd);
+	if(envVar != NULL){ //has env
+		for(int j = strlen(envVar); j >= 0; j--){
+			unput(envVar[j]);
+		}
+	}else{
+		perror("Invalid env var!");
+		exit(2);
+	}
+}
+
+std::regex e("\\${.*}", std::regex_constants::basic);
+bool val = std::regex_match(*argument, e);
+if(val){
+	char * cmd = strdup(argument->c_str() + 2);
+	if(cmd[strlen(argument->c_str()) - 3] == '}') cmd[strlen(argument->c_str()) - 3] = '\0';
+	char* envVar = getenv(cmd);
+	if(envVar != NULL){ //has env
+		argument = new std::string(envVar);
+	}else{
+		// perror("Invalid env var!");
+		// exit(2);
+	}
+}
